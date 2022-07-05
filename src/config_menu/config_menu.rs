@@ -1,8 +1,6 @@
 use crate::AppState;
 use bevy::{prelude::*, app::AppExit};
 
-use super::input;
-
 pub struct MainMenuPlugin;
 
 struct MainMenuData {
@@ -14,9 +12,7 @@ struct MenuMaterials {
     root: UiColor,
     border: UiColor,
     menu: UiColor,
-    button: UiColor,
-    button_hovered: UiColor,
-    button_pressed: UiColor,
+    button: UiColor
     button_text: Color,
 }
 
@@ -51,8 +47,6 @@ impl Plugin for MainMenuPlugin {
                 border: Color::rgb(0.65, 0.65, 0.65).into(),
                 menu: Color::rgb(0.15, 0.15, 0.15).into(),
                 button: Color::rgb(0.15, 0.15, 0.15).into(),
-                button_hovered: Color::rgb(0.25, 0.25, 0.25).into(),
-                button_pressed: Color::rgb(0.35, 0.75, 0.35).into(),
                 button_text: Color::WHITE,
             })
             .add_system(button_press_system)
