@@ -1,4 +1,4 @@
-use crate::AppState;
+use crate::{AppState, physics::GrenadeState};
 use bevy::{prelude::*, app::AppExit};
 
 pub struct MainMenuPlugin;
@@ -24,15 +24,19 @@ enum MenuButton {
 
 fn button_press_system(
     buttons: Query<(&Interaction, &MenuButton), (Changed<Interaction>, With<Button>)>,
-    mut state: ResMut<State<AppState>>,
+    mut app_state: ResMut<State<AppState>>,
+    mut grenade_state: ResMut<State<GrenadeState>>,
     mut exit: EventWriter<AppExit>
 ) {
     for (interaction, button) in buttons.iter() {
         if *interaction == Interaction::Clicked {
             match button {
-                MenuButton::Play => state
-                    .set(AppState::LiveSim)
-                    .expect("Couldn't switch state to InGame"),
+                MenuButton::Play => {
+                    app_state
+                        .set(AppState::LiveSim)
+                        .expect("Couldn't switch state to InGame");
+                    grenade_state.set(GrenadeState::Grenade);
+                }
                 MenuButton::Quit => exit.send(AppExit),
             };
         }

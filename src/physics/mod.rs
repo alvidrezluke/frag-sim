@@ -8,6 +8,7 @@ use self::grenade::GrenadeData;
 pub mod grenade;
 pub mod floor;
 pub mod sim_settings;
+pub mod fragment;
 
 pub struct PhyiscsSimPlugin;
 
@@ -15,16 +16,27 @@ impl Plugin for PhyiscsSimPlugin {
     fn build(&self, app: &mut App) {
         app
             .insert_resource(CursorLocked(true))
+            .add_state(GrenadeState::Grenade)
             .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(lock_cursor))
             .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(floor::spawn_floor))
+            .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(floor::spawn_light))
             .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(grenade::spawn_grenade))
             .add_system_set(SystemSet::on_update(AppState::LiveSim).with_system(grenade::explode_grenade))
+            .add_system_set(SystemSet::on_exit(AppState::LiveSim).with_system(fragment::clean_fragments))
             .add_system_set(SystemSet::on_exit(AppState::LiveSim).with_system(cleanup))
             .add_system_set(SystemSet::on_update(AppState::LiveSim).with_system(back_to_main_menu_controls))
+            .add_system_set(SystemSet::on_enter(GrenadeState::Fragment).with_system(fragment::generate_fragments))
+            .add_system_set(SystemSet::on_update(GrenadeState::Fragment).with_system(fragment::write_fragment_data))
             .add_startup_system(setup)
             .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
             .add_plugin(NoCameraPlayerPlugin);
     }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum GrenadeState {
+    Grenade,
+    Fragment,
 }
 
 fn setup(mut commands: Commands) {
@@ -38,7 +50,9 @@ fn setup(mut commands: Commands) {
         friction: 10.0,
         restitution: 0.9,
         initial_height: 5.0,
-        fragment_count: 10.0
+        fragment_count: 200,
+        // explosion_vel: 4000.0 // Realistic
+        explosion_vel: 100.0 //Better visuals
     });
 }
 

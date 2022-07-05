@@ -4,7 +4,7 @@ use bevy_flycam::FlyCam;
 
 use crate::AppState;
 
-use super::sim_settings::SimSettings;
+use super::{sim_settings::SimSettings, GrenadeState};
 
 #[derive(Component)]
 pub struct Grenade;
@@ -44,24 +44,30 @@ pub fn spawn_grenade(
     commands.insert_resource(GrenadeData {
         grenade,
         camera: camera_entity,
-        grenade_spawned: true
+        grenade_spawned: true,
+        last_location: Transform {..default()},
+        last_vel: Velocity {..default()}
     });
 }
 
 pub struct GrenadeData {
     pub grenade: Entity,
     pub camera: Entity,
-    pub grenade_spawned: bool
+    pub grenade_spawned: bool,
+    pub last_location: Transform,
+    pub last_vel: Velocity
 }
 
 pub struct GrenadeTimer(Timer);
 
 pub fn explode_grenade(
+    grenade_cur: Query<(&Transform, &Velocity), With<Grenade>>,
     mut commands: Commands,
     time: Res<Time>,
     mut timer: ResMut<GrenadeTimer>,
     mut query: Query<(Entity, With<Grenade>)>,
     app_state: ResMut<State<AppState>>,
+    mut grenade_state: ResMut<State<GrenadeState>>,
     mut grenade_data: ResMut<GrenadeData>,
     asset_server: Res<AssetServer>,
     audio: Res<Audio>
@@ -70,9 +76,13 @@ pub fn explode_grenade(
         if timer.0.tick(time.delta()).just_finished() && !query.is_empty(){
             let (entity, _grenade) = query.single_mut();
             if grenade_data.grenade_spawned {
+                let (pos, vel) = grenade_cur.single();
+                grenade_data.last_location = *pos;
+                grenade_data.last_vel = *vel;
                 commands.entity(entity).despawn();
                 grenade_data.grenade_spawned = false;
                 play_explosion(asset_server, audio);
+                grenade_state.set(GrenadeState::Fragment).expect("Could not set grenade state.");
             }
         }
     }
