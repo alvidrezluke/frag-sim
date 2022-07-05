@@ -16,9 +16,13 @@ pub fn generate_fragments(
     sim_settings: Res<SimSettings>,
     mut commands: Commands
 ) {
-    // println!("Pos: {}, LinVel: {}, AngVel: {}", grenade_data.last_location.translation, grenade_data.last_vel.linvel, grenade_data.last_vel.angvel);
+    let res = fs::remove_file("data.csv");
+    if res.is_err() {
+        println!("Could not delete file.")
+    } else {
+        println!("File deleted.")
+    }
     for _ in 0..sim_settings.fragment_count {
-
         let mut rng = thread_rng();
         let offset_x: f32 = rng.gen_range(-50..50) as f32 / 100.0;
         let offset_y: f32 = rng.gen_range(-50..50) as f32 / 100.0;
@@ -49,12 +53,20 @@ pub fn write_fragment_data(
     fragments: Query<(&Transform, &Velocity), With<Fragment>>,
     time: Res<Time>,
 ) {
-    println!("{:?}", time.delta());
     let result = write_to_file(fragments, time);
+    if result.is_err() {
+        println!("Could not output data to file.")
+    }
 }
 
 fn write_to_file(fragments: Query<(&Transform, &Velocity), With<Fragment>>, time: Res<Time>) -> Result<(), Box<dyn Error>>{
-    let mut wtr = Writer::from_path("data.csv")?;
+    let file = fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .append(true)
+        .open("data.csv")
+        .unwrap();
+    let mut wtr = Writer::from_writer(file);
     let mut record = vec![];
     record.push(format!("{}", time.delta().as_millis()));
     for (pos, vel) in fragments.iter() {

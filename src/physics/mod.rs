@@ -50,7 +50,7 @@ fn setup(mut commands: Commands) {
         friction: 10.0,
         restitution: 0.9,
         initial_height: 5.0,
-        fragment_count: 200,
+        fragment_count: 1000,
         // explosion_vel: 4000.0 // Realistic
         explosion_vel: 100.0 //Better visuals
     });
