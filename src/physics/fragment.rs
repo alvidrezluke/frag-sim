@@ -4,7 +4,7 @@ use csv::Writer;
 use rand::prelude::*;
 use std::{error::Error, fs};
 
-use super::{sim_settings::SimSettings, grenade::{GrenadeData, Grenade}, GrenadeState};
+use super::{sim_settings::SimSettings, grenade::GrenadeData, GrenadeState};
 
 #[derive(Component)]
 pub struct Fragment;
@@ -50,6 +50,7 @@ pub fn generate_fragments(
         .insert(Collider::cuboid(0.1, 0.1, 0.1))
         .insert(Friction::coefficient(sim_settings.friction))
         .insert(ExternalForce {..default()})
+        .insert(ColliderMassProperties::Density(4.0))
         .insert_bundle(TransformBundle::from(Transform::from_xyz(x_pos, y_pos, z_pos)));
     }
 }
@@ -90,5 +91,5 @@ pub fn clean_fragments(
     for fragment in fragments.iter() {
         commands.entity(fragment).despawn_recursive();
     }
-    grenade_state.set(GrenadeState::Grenade);
+    grenade_state.set(GrenadeState::Grenade).expect("Could not set grenade state.");
 }

@@ -6,7 +6,7 @@ use crate::AppState;
 use self::grenade::GrenadeData;
 
 pub mod grenade;
-pub mod floor;
+pub mod sim_setup;
 pub mod sim_settings;
 pub mod fragment;
 
@@ -18,8 +18,8 @@ impl Plugin for PhyiscsSimPlugin {
             .insert_resource(CursorLocked(true))
             .add_state(GrenadeState::Grenade)
             .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(lock_cursor))
-            .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(floor::spawn_floor))
-            .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(floor::spawn_light))
+            .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(sim_setup::spawn_solid_surfaces))
+            .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(sim_setup::spawn_light))
             .add_system_set(SystemSet::on_enter(AppState::LiveSim).with_system(grenade::spawn_grenade))
             .add_system_set(SystemSet::on_update(AppState::LiveSim).with_system(grenade::explode_grenade))
             .add_system_set(SystemSet::on_exit(AppState::LiveSim).with_system(fragment::clean_fragments))
