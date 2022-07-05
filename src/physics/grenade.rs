@@ -15,9 +15,8 @@ pub fn spawn_grenade(
     mut materials: ResMut<Assets<StandardMaterial>>,
     sim_settings: Res<SimSettings>
 ) {
-    println!("Spawning grenade");
     let grenade = commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Capsule {radius: 0.2, depth: 0.5, ..default()})),
+        mesh: meshes.add(Mesh::from(shape::Capsule {radius: 0.2, depth: 0.2, ..default()})),
         material: materials.add(Color::rgb(1.0, 0.0, 0.0).into()),
         ..default()
     })
@@ -27,7 +26,7 @@ pub fn spawn_grenade(
         linvel: sim_settings.lin_vel,
         angvel: sim_settings.ang_vel,
     })
-    .insert(Collider::capsule(Vec3::new(0.0, -0.25, 0.0), Vec3::new(0.0, 0.25, 0.0), 0.2))
+    .insert(Collider::capsule(Vec3::new(0.0, -0.1, 0.0), Vec3::new(0.0, 0.1, 0.0), 0.2))
     .insert(Friction::coefficient(sim_settings.friction))
     .insert(Restitution::coefficient(sim_settings.restitution))
     .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, sim_settings.initial_height, 0.0))).id();
@@ -62,17 +61,23 @@ pub fn explode_grenade(
     time: Res<Time>,
     mut timer: ResMut<GrenadeTimer>,
     mut query: Query<(Entity, With<Grenade>)>,
-    mut app_state: ResMut<State<AppState>>,
-    mut grenade_data: ResMut<GrenadeData>
+    app_state: ResMut<State<AppState>>,
+    mut grenade_data: ResMut<GrenadeData>,
+    asset_server: Res<AssetServer>,
+    audio: Res<Audio>
 ) {
     if *app_state.current() == AppState::LiveSim {
-        if timer.0.tick(time.delta()).just_finished() {
+        if timer.0.tick(time.delta()).just_finished() && !query.is_empty(){
             let (entity, _grenade) = query.single_mut();
             if grenade_data.grenade_spawned {
-                println!("Boom");
                 commands.entity(entity).despawn();
                 grenade_data.grenade_spawned = false;
+                play_explosion(asset_server, audio);
             }
         }
     }
+}
+
+fn play_explosion(asset_server: Res<AssetServer>, audio: Res<Audio>) {
+    audio.play(asset_server.load("grenade.ogg"));
 }

@@ -8,5 +8,5 @@ pub struct SimSettings {
     pub friction: f32,
     pub restitution: f32,
     pub initial_height: f32,
-    pub fragment_count: i32
+    pub fragment_count: f32
 }

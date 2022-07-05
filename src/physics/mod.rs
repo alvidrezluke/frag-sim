@@ -1,9 +1,9 @@
 use bevy::prelude::*;
-use bevy_flycam::{NoCameraPlayerPlugin};
+use bevy_flycam::NoCameraPlayerPlugin;
 use bevy_rapier3d::prelude::*;
 use crate::AppState;
 
-use self::grenade::{GrenadeData};
+use self::grenade::GrenadeData;
 
 pub mod grenade;
 pub mod floor;
@@ -28,7 +28,7 @@ impl Plugin for PhyiscsSimPlugin {
 }
 
 fn setup(mut commands: Commands) {
-    let lin_vel: Vec3 = Vec3::new(1.0, 2.0, 1.0);
+    let lin_vel: Vec3 = Vec3::new(7.0, 2.0, 7.0);
     let ang_vel: Vec3 = Vec3::new(1.0, 2.0, 1.0);
     commands.insert_resource(sim_settings::SimSettings {
         fuse_time: 5.0,
@@ -38,7 +38,7 @@ fn setup(mut commands: Commands) {
         friction: 10.0,
         restitution: 0.9,
         initial_height: 5.0,
-        fragment_count: 10
+        fragment_count: 10.0
     });
 }
 

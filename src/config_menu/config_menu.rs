@@ -1,6 +1,8 @@
 use crate::AppState;
 use bevy::{prelude::*, app::AppExit};
 
+use super::input;
+
 pub struct MainMenuPlugin;
 
 struct MainMenuData {
@@ -9,50 +11,19 @@ struct MainMenuData {
 }
 
 struct MenuMaterials {
-    root: Handle<ColorMaterial>,
-    border: Handle<ColorMaterial>,
-    menu: Handle<ColorMaterial>,
-    button: Handle<ColorMaterial>,
-    button_hovered: Handle<ColorMaterial>,
-    button_pressed: Handle<ColorMaterial>,
+    root: UiColor,
+    border: UiColor,
+    menu: UiColor,
+    button: UiColor,
+    button_hovered: UiColor,
+    button_pressed: UiColor,
     button_text: Color,
-}
-
-impl FromWorld for MenuMaterials {
-    fn from_world(world: &mut World) -> Self {
-        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
-        MenuMaterials {
-            root: materials.add(Color::NONE.into()),
-            border: materials.add(Color::rgb(0.65, 0.65, 0.65).into()),
-            menu: materials.add(Color::rgb(0.15, 0.15, 0.15).into()),
-            button: materials.add(Color::rgb(0.15, 0.15, 0.15).into()),
-            button_hovered: materials.add(Color::rgb(0.25, 0.25, 0.25).into()),
-            button_pressed: materials.add(Color::rgb(0.35, 0.75, 0.35).into()),
-            button_text: Color::WHITE,
-        }
-    }
 }
 
 #[derive(Component)]
 enum MenuButton {
     Play,
     Quit,
-}
-
-fn button_system(
-    materials: Res<MenuMaterials>,
-    mut buttons: Query<
-        (&Interaction, &mut Handle<ColorMaterial>),
-        (Changed<Interaction>, With<Button>),
-    >
-) {
-    for (interaction, mut material) in buttons.iter_mut() {
-        match *interaction {
-            Interaction::Clicked => *material = materials.button_pressed.clone(),
-            Interaction::Hovered => *material = materials.button_hovered.clone(),
-            Interaction::None => *material = materials.button.clone(),
-        }
-    }
 }
 
 fn button_press_system(
@@ -74,8 +45,16 @@ fn button_press_system(
 
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<MenuMaterials>()
-            .add_system(button_system)
+        app
+            .insert_resource(MenuMaterials {
+                root: Color::NONE.into(),
+                border: Color::rgb(0.65, 0.65, 0.65).into(),
+                menu: Color::rgb(0.15, 0.15, 0.15).into(),
+                button: Color::rgb(0.15, 0.15, 0.15).into(),
+                button_hovered: Color::rgb(0.25, 0.25, 0.25).into(),
+                button_pressed: Color::rgb(0.35, 0.75, 0.35).into(),
+                button_text: Color::WHITE,
+            })
             .add_system(button_press_system)
             .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(setup))
             .add_system_set(SystemSet::on_exit(AppState::MainMenu).with_system(cleanup));
@@ -90,7 +69,7 @@ fn root(materials: &Res<MenuMaterials>) -> NodeBundle {
             align_items: AlignItems::Center,
             ..Default::default()
         },
-        color: UiColor(Color::NONE),
+        color: materials.root,
         ..Default::default()
     }
 }
@@ -102,7 +81,7 @@ fn border(materials: &Res<MenuMaterials>) -> NodeBundle {
             border: Rect::all(Val::Px(8.0)),
             ..Default::default()
         },
-        color: UiColor(Color::rgb(0.65, 0.65, 0.65)),
+        color: materials.border,
         ..Default::default()
     }
 }
@@ -117,7 +96,7 @@ fn menu_background(materials: &Res<MenuMaterials>) -> NodeBundle {
             padding: Rect::all(Val::Px(5.0)),
             ..Default::default()
         },
-        color: UiColor(Color::rgb(0.15, 0.15, 0.15)),
+        color: materials.menu,
         ..Default::default()
     }
 }
@@ -130,7 +109,7 @@ fn button(materials: &Res<MenuMaterials>) -> ButtonBundle {
             align_items: AlignItems::Center,
             ..Default::default()
         },
-        color: UiColor(Color::rgb(0.15, 0.15, 0.15)),
+        color: materials.button,
         ..Default::default()
     }
 }
