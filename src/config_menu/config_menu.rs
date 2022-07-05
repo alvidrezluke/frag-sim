@@ -12,7 +12,7 @@ struct MenuMaterials {
     root: UiColor,
     border: UiColor,
     menu: UiColor,
-    button: UiColor
+    button: UiColor,
     button_text: Color,
 }
 
