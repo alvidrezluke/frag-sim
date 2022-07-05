@@ -16,11 +16,9 @@ pub fn generate_fragments(
     sim_settings: Res<SimSettings>,
     mut commands: Commands
 ) {
-    let res = fs::remove_file("data.csv");
+    let res = fs::remove_file(sim_settings.csv_location.clone());
     if res.is_err() {
         println!("Could not delete file.")
-    } else {
-        println!("File deleted.")
     }
     for _ in 0..sim_settings.fragment_count {
         let mut rng = thread_rng();
@@ -58,19 +56,20 @@ pub fn generate_fragments(
 pub fn write_fragment_data(
     fragments: Query<(&Transform, &Velocity), With<Fragment>>,
     time: Res<Time>,
+    sim_settings: Res<SimSettings>
 ) {
-    let result = write_to_file(fragments, time);
+    let result = write_to_file(fragments, time, sim_settings.csv_location.clone());
     if result.is_err() {
         println!("Could not output data to file.")
     }
 }
 
-fn write_to_file(fragments: Query<(&Transform, &Velocity), With<Fragment>>, time: Res<Time>) -> Result<(), Box<dyn Error>>{
+fn write_to_file(fragments: Query<(&Transform, &Velocity), With<Fragment>>, time: Res<Time>, path: String) -> Result<(), Box<dyn Error>>{
     let file = fs::OpenOptions::new()
         .write(true)
         .create(true)
         .append(true)
-        .open("data.csv")
+        .open(path)
         .unwrap();
     let mut wtr = Writer::from_writer(file);
     let mut record = vec![];
@@ -85,11 +84,9 @@ fn write_to_file(fragments: Query<(&Transform, &Velocity), With<Fragment>>, time
 
 pub fn clean_fragments(
     fragments: Query<Entity, With<Fragment>>,
-    mut grenade_state: ResMut<State<GrenadeState>>,
     mut commands: Commands
 ) {
     for fragment in fragments.iter() {
         commands.entity(fragment).despawn_recursive();
     }
-    grenade_state.set(GrenadeState::Grenade).expect("Could not set grenade state.");
 }
