@@ -1,8 +1,8 @@
 use bevy::math::Vec3;
 
+// Set up data structure for handling all simulation settings. 
 pub struct SimSettings {
     pub fuse_time: f32,
-    // pub density: f32,
     pub lin_vel: Vec3,
     pub ang_vel: Vec3,
     pub friction: f32,

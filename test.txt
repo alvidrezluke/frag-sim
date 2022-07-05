@@ -4,6 +4,6 @@ ang_vel:<1.0, 2.0, 1.0>
 friction:10.0
 restitution:0.9
 initial_height:5.0
-fragment_count:100
+fragment_count:1000
 explosion_vel:480.0
 csv_location:data1.csv
