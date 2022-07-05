@@ -27,10 +27,15 @@ pub fn generate_fragments(
         let offset_x: f32 = rng.gen_range(-50..50) as f32 / 100.0;
         let offset_y: f32 = rng.gen_range(-50..50) as f32 / 100.0;
         let offset_z: f32 = rng.gen_range(-50..50) as f32 / 100.0;
-        // W = F * d = 1/2 m v^2
         let vel_x: f32 = grenade_data.last_vel.linvel.x + (sim_settings.explosion_vel * offset_x);
         let vel_y: f32 = grenade_data.last_vel.linvel.y + (sim_settings.explosion_vel * offset_y);
         let vel_z: f32 = grenade_data.last_vel.linvel.z + (sim_settings.explosion_vel * offset_z);
+        let x_pos: f32 = grenade_data.last_location.translation.x + offset_x;
+        let mut y_pos: f32 = grenade_data.last_location.translation.y + offset_y;
+        let z_pos: f32 = grenade_data.last_location.translation.z + offset_z;
+        if y_pos < 0.0 {
+            y_pos = 0.0;
+        }
         commands.spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube {size: 0.05})),
             material: materials.add(Color::rgb(1.0, 0.0, 0.0).into()),
@@ -45,7 +50,7 @@ pub fn generate_fragments(
         .insert(Collider::cuboid(0.1, 0.1, 0.1))
         .insert(Friction::coefficient(sim_settings.friction))
         .insert(ExternalForce {..default()})
-        .insert_bundle(TransformBundle::from(Transform::from_xyz(grenade_data.last_location.translation.x + offset_x, grenade_data.last_location.translation.y + offset_y, grenade_data.last_location.translation.z + offset_z)));
+        .insert_bundle(TransformBundle::from(Transform::from_xyz(x_pos, y_pos, z_pos)));
     }
 }
 

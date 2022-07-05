@@ -51,8 +51,7 @@ fn setup(mut commands: Commands) {
         restitution: 0.9,
         initial_height: 5.0,
         fragment_count: 1000,
-        // explosion_vel: 4000.0 // Realistic
-        explosion_vel: 100.0 //Better visuals
+        explosion_vel: 480.0
     });
 }
 
