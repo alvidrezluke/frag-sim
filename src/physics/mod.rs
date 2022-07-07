@@ -3,7 +3,7 @@ use bevy_flycam::NoCameraPlayerPlugin;
 use bevy_rapier3d::prelude::*;
 use crate::AppState;
 
-use self::{grenade::GrenadeData, sim_settings::SimSettings};
+use self::{grenade::GrenadeData, sim_settings::SimSettings, sim_setup::Wall};
 
 pub mod grenade;
 pub mod sim_setup;
@@ -134,11 +134,15 @@ fn back_to_main_menu_controls(
 }
 
 // Remove grenade and camers
-fn cleanup(mut commands: Commands, sim_data: Res<GrenadeData>) {
+fn cleanup(mut commands: Commands, sim_data: Res<GrenadeData>, walls: Query<Entity, With<Wall>>) {
 
     // If grenade exists then despawn it
     if sim_data.grenade_spawned {
         commands.entity(sim_data.grenade).despawn_recursive();
+    }
+
+    for wall in walls.iter() {
+        commands.entity(wall).despawn_recursive();
     }
 
     // Despawn camera

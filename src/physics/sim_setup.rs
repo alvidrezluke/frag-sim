@@ -4,6 +4,9 @@ use std::fs;
 
 use super::sim_settings::SimSettings;
 
+#[derive(Component)]
+pub struct Wall;
+
 pub fn spawn_solid_surfaces(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -27,6 +30,9 @@ pub fn spawn_solid_surfaces(
         // Add a collider that is the same size as the block
         .insert(Collider::cuboid(100.0, 10.0, 100.0))
 
+        // Add component to find easier
+        .insert(Wall)
+
         // Move into position
         .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, -10.0, 0.0)));
     
@@ -46,6 +52,9 @@ pub fn spawn_solid_surfaces(
 
         // Add a collider the same size as the box
         .insert(Collider::cuboid(100.0, 75.0, 1.0))
+
+        // Add component to find easier
+        .insert(Wall)
         
         // Move into position
         .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, 0.0, 50.0)));
@@ -67,6 +76,9 @@ pub fn spawn_solid_surfaces(
         // Add a collider the same size as the box
         .insert(Collider::cuboid(100.0, 75.0, 1.0))
 
+        // Add component to find easier
+        .insert(Wall)
+
         // Move into position
         .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -50.0)));
 
@@ -87,6 +99,9 @@ pub fn spawn_solid_surfaces(
         // Add a collider the same size as the box
         .insert(Collider::cuboid(1.0, 75.0, 100.0))
 
+        // Add component to find easier
+        .insert(Wall)
+
         // Move into position
         .insert_bundle(TransformBundle::from(Transform::from_xyz(50.0, 0.0, 0.0)));
 
@@ -106,6 +121,9 @@ pub fn spawn_solid_surfaces(
 
         // Add a collider the same size as the box
         .insert(Collider::cuboid(1.0, 75.0, 100.0))
+
+        // Add component to find easier
+        .insert(Wall)
 
         // Move into position
         .insert_bundle(TransformBundle::from(Transform::from_xyz(-50.0, 0.0, 0.0)));
